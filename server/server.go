@@ -22,7 +22,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		monitor, err := monitor.New(r.FormValue("upper"), r.FormValue("lower"))
 
 		if err != nil {
-			fmt.Println("failed to initialise monitor:", err)
+			renderError(err, w)
 			return
 		}
 		s.monitor = monitor
@@ -34,7 +34,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		err := s.monitor.AddReading(r.FormValue("reading"))
 
 		if err != nil {
-			fmt.Println("Failed to read user input:", err)
+			renderError(err, w)
 			return
 		}
 
@@ -48,6 +48,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(string(reqbytes))
 	}
 
+	// Constructs information for template
 	data := struct {
 		Readings []decimal.Decimal
 	}{
