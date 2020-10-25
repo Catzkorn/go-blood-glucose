@@ -1,0 +1,60 @@
+package main
+
+import (
+	"fmt"
+
+	"github.com/Catzkorn/go-blood-glucose/monitor"
+)
+
+func main() {
+
+	_, err := fmt.Printf("Welcome to the blood glucose monitor! Please enter your limits:\nUpper Limit: ")
+	if err != nil {
+		panic("Panic! at the Disco")
+	}
+
+	var userUpperInput string
+	_, err = fmt.Scan(&userUpperInput)
+	if err != nil {
+		fmt.Println("Failed to read user input:", err)
+		return
+	}
+
+	_, err = fmt.Printf("Lower Limit: ")
+	if err != nil {
+		fmt.Println("Failed to read user input:", err)
+		return
+	}
+	var userLowerInput string
+	_, err = fmt.Scan(&userLowerInput)
+
+	if err != nil {
+		fmt.Println("Failed to read user input:", err)
+		return
+	}
+
+	monitor, err := monitor.New(userUpperInput, userLowerInput)
+
+	if err != nil {
+		fmt.Println("failed to initialise monitor:", err)
+		return
+	}
+
+	fmt.Printf("Add reading: ")
+
+	var userReading string
+	_, err = fmt.Scan(&userReading)
+
+	if err != nil {
+		fmt.Println("Failed to read user input:", err)
+		return
+	}
+
+	err = monitor.AddReading(userReading)
+
+	if err != nil {
+		fmt.Println("Failed to read user input:", err)
+		return
+	}
+
+}
