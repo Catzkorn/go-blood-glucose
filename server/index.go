@@ -26,6 +26,9 @@ const indexTemplate = `<!DOCTYPE html>
 </form>
 </div>
 
+{{ if .MonitorCreated }}
+
+
 <div class="add_reading">
 <form action="/add_reading" method="post">
 <label for="upper">Add Reading:</label>
@@ -33,6 +36,9 @@ const indexTemplate = `<!DOCTYPE html>
 <input type="submit" value="Submit">
 </form>
 </div>
+
+{{end}}
+
 
 {{range .Readings}}<div>{{ . }}</div>{{else}}<div><strong>no readings</strong></div>{{end}}
 

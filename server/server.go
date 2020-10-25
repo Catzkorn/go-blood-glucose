@@ -11,11 +11,17 @@ import (
 
 // Server defines a server
 type Server struct {
-	monitor monitor.Monitor
+	monitor *monitor.Monitor
 }
 
 // Handle implements a standard library http.Handler
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
+	reqbytes, err := httputil.DumpRequest(r, true)
+
+	if err == nil {
+		fmt.Println(string(reqbytes))
+	}
 
 	switch r.URL.Path {
 	case "/update_monitor":
@@ -25,7 +31,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			renderError(err, w)
 			return
 		}
-		s.monitor = monitor
+		s.monitor = &monitor
 
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
@@ -42,17 +48,21 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	reqbytes, err := httputil.DumpRequest(r, true)
-
-	if err == nil {
-		fmt.Println(string(reqbytes))
+	// This is an easy way to reverse a slice in go https://github.com/golang/go/wiki/SliceTricks#reversing
+	readings := s.monitor.Readings()
+	for i := len(readings)/2 - 1; i >= 0; i-- {
+		opp := len(readings) - 1 - i
+		readings[i], readings[opp] = readings[opp], readings[i]
 	}
 
 	// Constructs information for template
 	data := struct {
-		Readings []decimal.Decimal
+		Readings       []decimal.Decimal
+		MonitorCreated bool
 	}{
-		Readings: s.monitor.Readings(),
+
+		Readings:       readings,
+		MonitorCreated: s.monitor != nil,
 	}
 
 	err = parsedIndexTemplate.Execute(w, data)

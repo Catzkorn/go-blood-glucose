@@ -49,6 +49,10 @@ func New(upperLimit string, lowerLimit string) (Monitor, error) {
 // AddReading accepts a BG reading
 func (m *Monitor) AddReading(reading string) error {
 
+	if m == nil {
+		return fmt.Errorf("cannot input readings without setting an upper and lower limit")
+	}
+
 	readingDec, err := decimal.NewFromString(reading)
 	if err != nil {
 		return fmt.Errorf("failed to parse reading: %w", err)
@@ -69,6 +73,9 @@ func (m *Monitor) AddReading(reading string) error {
 
 // Readings returns all the readings
 func (m *Monitor) Readings() []decimal.Decimal {
+	if m == nil {
+		return nil
+	}
 
 	return m.readings
 }
