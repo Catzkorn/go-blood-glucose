@@ -6,6 +6,7 @@ import (
 	"net/http/httputil"
 
 	"github.com/Catzkorn/go-blood-glucose/monitor"
+	"github.com/shopspring/decimal"
 )
 
 // Server defines a server
@@ -47,40 +48,15 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(string(reqbytes))
 	}
 
-	w.Write([]byte(
-		`<!DOCTYPE html>
-	<html>
-	
-	<head>
-		
-		<meta charset="UTF-8">
-		
-	</head>
-	
-	<body>
+	data := struct {
+		Readings []decimal.Decimal
+	}{
+		Readings: s.monitor.Readings(),
+	}
 
-
-	<p>Blood Glucose Monitoring Site</p>
-
-	<div class="add_limits">
-	<form action="/update_monitor" method="post">
-	<label for="upper">Upper Limit:</label>
-	<input type="text" name="upper"><br>
-	<label for="lower">Lower Limit:</label>
-  <input type="text" name="lower"><br>
-  <input type="submit" value="Submit">
-  </form>
-</div>
-
-<div class="add_reading">
-	<form action="/add_reading" method="post">
-	<label for="upper">Add Reading:</label>
-	<input type="text" name="reading"><br>
-  <input type="submit" value="Submit">
-  </form>
-</div>
-
-
-</body>`),
-	)
+	err = parsedIndexTemplate.Execute(w, data)
+	if err != nil {
+		fmt.Println("Failed to execute template:", err)
+		return
+	}
 }
